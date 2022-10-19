@@ -1,2 +1,1 @@
-export * from './page-hello';
-export * from './page-home';
+export * from './card-question';
