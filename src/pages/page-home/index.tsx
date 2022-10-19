@@ -1,17 +1,44 @@
 import * as React from 'react';
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Container, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Container, List, ListItem, Skeleton, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { $percentage, getQuestions } from '../../../services';
 import { QuestionCard } from '../../components';
 import { makeStyles } from '@material-ui/styles';
+
+
+const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answered: number }) => {
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('md'));
+  const classes = useStyles({ mobile });
+  return (
+    <Box className={classes.summary} >
+      <List sx={{ width: mobile ? '100%' : '15%' }}>
+        <ListItem >
+          <Typography variant='h6'>Currect:</Typography>
+          <Typography variant='h6'>{currectAnswered}</Typography>
+        </ListItem>
+        <ListItem >
+          <Typography variant='h6'>Total:</Typography>
+          <Typography variant='h6'>{answered}</Typography>
+        </ListItem>
+        <ListItem sx={{ justifyContent: 'flex-end' }}>
+          <Typography variant='h6'>{$percentage(currectAnswered / answered)}</Typography>
+        </ListItem>
+      </List>
+    </Box >
+  )
+}
 
 export const PageHome = () => {
   useQueryClient();
   const [currectAnswered, setCurrectAnswered] = useState(0);
   const [answered, setAnswered] = useState(0);
   const { data, refetch, isFetched, isFetching, isLoading, error, isRefetching } = useQuery(['todos'], getQuestions)
-  const classes = useStyles();
+
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down('md'));
+  const classes = useStyles({ mobile });
 
   const refetchHandler = () => {
     setAnswered(prev => prev + 1);
@@ -23,13 +50,8 @@ export const PageHome = () => {
   }
   const queryOptions = { refetchHandler, isFetched, isFetching, isLoading, error, isRefetching };
   return (
-    <Container >
-      <Stack className={classes.stack}>
-        <Typography variant='h6' sx={{ textAlign: 'right' }}>Currect: {currectAnswered}</Typography>
-        <Typography variant='h6' sx={{ textAlign: 'right' }}>Total answered: {answered}</Typography>
-        <Typography variant='h6'>{$percentage(currectAnswered / answered)}</Typography>
-      </Stack>
-
+    <Container className={classes.container}>
+      <Summary currectAnswered={currectAnswered} answered={answered} />
       {
         isLoading ?
           <Stack spacing={2}>
@@ -46,8 +68,11 @@ export const PageHome = () => {
 };
 
 const useStyles = makeStyles({
-  stack: {
-    justifyContent: 'flex-end',
-    textAlign: 'right'
-  }
+  container: {
+  },
+  summary: {
+    display: 'flex',
+    alignItems: 'end',
+    justifyContent: 'flex-end'
+  },
 })

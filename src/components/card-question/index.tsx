@@ -9,12 +9,11 @@ import {
   RadioGroup, Radio,
   CircularProgress,
   useMediaQuery,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { makeStyles } from '@material-ui/styles';
 import { IQuestion } from '../../../services/model';
-
 interface IQueryOptions {
   refetchHandler?: () => void,
   isFetched?: boolean,
@@ -80,7 +79,7 @@ export const QuestionCard = (
       return;
     }
     if (answer === question.correct_answer) {
-      setHelperText('You got it!');
+      setHelperText('Currect!');
       answerCurrect();
       setError(false);
     } else {
@@ -90,7 +89,7 @@ export const QuestionCard = (
   };
 
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} elevation={6} sx={{}}>
       <Stack direction={mobile ? 'column-reverse' : 'row'} spacing={2} >
         <Box className={classes.question}>
           {
@@ -100,9 +99,9 @@ export const QuestionCard = (
               </Box>
               :
               <>
-                <Typography variant='h6' paragraph>{question.question}</Typography>
+                <Typography variant='h5' fontWeight={'bold'} paragraph className={classes.questionText}>{question.question}</Typography>
                 <form >
-                  <FormControl error={error} variant="standard" >
+                  <FormControl error={error} variant="standard" fullWidth>
                     <RadioGroup
                       name="quiz"
                       value={value}
@@ -112,10 +111,12 @@ export const QuestionCard = (
                           <FormControlLabel
                             key={answer}
                             disabled={!!value}
-                            sx={{ color: value ? answer === question.correct_answer ? '#4bfe44' : 'red' : 'black' }}
+                            sx={{
+                              color: value ? answer === question.correct_answer ? '#0cbd1b' : 'red' : 'inherit',
+                            }}
                             value={answer}
                             control={<Radio />}
-                            label={<Typography>{answer}</Typography>} />
+                            label={<Typography fontWeight={'700'}>{answer}</Typography>} />
                         )
                       }
                     </RadioGroup>
@@ -138,7 +139,11 @@ const useStyles = makeStyles({
     textAlign: 'center',
   },
   paper: {
-    padding: '24px'
+    padding: '24px',
+    '&.MuiPaper-root': {
+      borderRadius: '30px',
+      background: 'linear-gradient(to bottom, #ffd58e, #fff5ee)'
+    },
   },
   question: {
     display: 'flex',
@@ -150,6 +155,9 @@ const useStyles = makeStyles({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  questionText: {
+    textShadow: '1px 1px 2px pink'
   },
   timerBox: {
     display: 'flex',
