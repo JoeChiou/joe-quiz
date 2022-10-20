@@ -1,29 +1,41 @@
 import * as React from 'react';
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Box, Container, List, ListItem, Skeleton, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { makeStyles } from '@material-ui/styles';
+import { Check, QuestionAnswer, Functions } from '@mui/icons-material';
 import { $percentage, getQuestions } from '../../../services';
 import { QuestionCard } from '../../components';
-import { makeStyles } from '@material-ui/styles';
 
 
 const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answered: number }) => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const classes = useStyles({ mobile });
+  const listItemSx = { py: mobile ? 0 : 1 }
   return (
     <Box className={classes.summary} >
-      <List sx={{ width: mobile ? '100%' : '15%' }}>
-        <ListItem >
-          <Typography variant='h6'>Currect:</Typography>
-          <Typography variant='h6'>{currectAnswered}</Typography>
+      <List sx={{ width: mobile ? '100%' : '25%' }}>
+        <ListItem sx={listItemSx}>
+          <Typography variant='h6' className={classes.listItemText}>
+            <Check color='success' />&ensp;
+            Currect:
+          </Typography>
+          <Typography variant='h6' color={theme.palette.success.main}>{currectAnswered}</Typography>
         </ListItem>
-        <ListItem >
-          <Typography variant='h6'>Total:</Typography>
-          <Typography variant='h6'>{answered}</Typography>
+        <ListItem sx={listItemSx}>
+          <Typography variant='h6' className={classes.listItemText}>
+            <QuestionAnswer color='info' />&ensp;
+            Total:
+          </Typography>
+          <Typography variant='h6' color={theme.palette.info.main}>{answered}</Typography>
         </ListItem>
-        <ListItem sx={{ justifyContent: 'flex-end' }}>
-          <Typography variant='h6'>{$percentage(currectAnswered / answered)}</Typography>
+        <ListItem sx={listItemSx}>
+          <Typography variant='h6' className={classes.listItemText}>
+            <Functions color='warning' />&ensp;
+            Accuracy:
+          </Typography>
+          <Typography variant='h6' color={theme.palette.warning.main}>{$percentage(currectAnswered / answered)}</Typography>
         </ListItem>
       </List>
     </Box >
@@ -48,7 +60,9 @@ export const PageHome = () => {
   const answerCurrect = () => {
     setCurrectAnswered(prev => prev + 1);
   }
+
   const queryOptions = { refetchHandler, isFetched, isFetching, isLoading, error, isRefetching };
+
   return (
     <Container className={classes.container}>
       <Summary currectAnswered={currectAnswered} answered={answered} />
@@ -75,4 +89,15 @@ const useStyles = makeStyles({
     alignItems: 'end',
     justifyContent: 'flex-end'
   },
+  listItem: {
+    '&.MuiListItem-root': {
+      border: '1px solid blue',
+      paddingTop: (mobile) => mobile ? 0 : '50px',
+      paddingBottom: (mobile) => mobile ? 0 : '50px',
+    }
+  },
+  listItemText: {
+    display: 'flex',
+    alignItems: 'center',
+  }
 })

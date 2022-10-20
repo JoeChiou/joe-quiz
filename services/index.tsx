@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { IQuestion } from './model';
 
-
 export const getQuestions = async () => {
   try {
     const rsp = await axios.get(`https://opentdb.com/api.php?amount=1&encode=url3986`)
     let data: IQuestion[] = rsp.data.results;
     data.forEach(ele => {
       ele.question = decodeURIComponent(ele.question);
+      ele.category = decodeURIComponent(ele.category);
       ele.incorrect_answers = ele.incorrect_answers.map(ans => decodeURIComponent(ans));
       ele.correct_answer = decodeURIComponent(ele.correct_answer);
 

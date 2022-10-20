@@ -11,43 +11,43 @@ const queryClient = new QueryClient({
       refetchOnReconnect: false,
     },
   },
-})
+});
 
-export const App = () => {
-  const theme = createTheme({
-    palette: {
-    },
-    typography: {
-      h6: { fontWeight: 'bold' },
-      fontFamily: ['Roboto', 'Arial', 'sans-serif'].join(','),
-    },
-    components: {
-      MuiList: {
-        variants: [
-          {
-            props: { disablePadding: true },
-            style: {},
-          }
-        ],
-      },
-      MuiListItem: {
-        variants: [
-          {
-            props: { disableGutters: true },
-            style: {},
-          }
-        ],
-        styleOverrides: {
-          root: { justifyContent: 'space-between' }
+const theme = createTheme({
+  palette: {
+  },
+  typography: {
+    h5: { fontWeight: 'bold' },
+    h6: { fontWeight: 'bold' },
+    fontFamily: ['Roboto', 'Arial', 'sans-serif'].join(','),
+  },
+  components: {
+    MuiList: {
+      variants: [
+        {
+          props: { disablePadding: true },
+          style: {},
         }
+      ],
+    },
+    MuiListItem: {
+      variants: [
+        {
+          props: { disableGutters: true },
+          style: {},
+        }
+      ],
+      styleOverrides: {
+        root: { justifyContent: 'space-between' }
       }
     }
-  })
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <PageHome />
-      </ThemeProvider>
-    </QueryClientProvider >
-  )
-}
+  }
+});
+
+export const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider theme={theme}>
+      <PageHome />
+    </ThemeProvider>
+  </QueryClientProvider >
+);

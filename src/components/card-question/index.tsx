@@ -10,10 +10,12 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
+  Chip,
 } from '@mui/material';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { makeStyles } from '@material-ui/styles';
 import { IQuestion } from '../../../services/model';
+
 interface IQueryOptions {
   refetchHandler?: () => void,
   isFetched?: boolean,
@@ -25,10 +27,17 @@ interface IQueryOptions {
 
 const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, value: string, submit: (timeout: boolean) => void }) => {
   const classes = useStyles();
+  const isPlaying = !queryOptions.isRefetching && queryOptions.isFetched && !value;
 
+  const renderRemainingTime = ({ remainingTime, color }: { remainingTime: number, color: string }) => (
+    <Box className={classes.remainingtimeBox} sx={{ color: color }}>
+      <Typography variant='h4'>{remainingTime}</Typography>
+    </Box>
+  )
+  
   return (
     <CountdownCircleTimer
-      isPlaying={!queryOptions.isRefetching && queryOptions.isFetched && !value}
+      isPlaying={isPlaying}
       duration={15}
       colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
       colorsTime={[10, 6, 3, 0]}
@@ -40,12 +49,7 @@ const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, 
         }, 1500);
         return ({ shouldRepeat: true, delay: 1.5 })
       }}>
-      {({ remainingTime, color }) => (
-        <Box className={classes.remainingtimeBox} sx={{ color: color }}>
-          <Typography variant='h4'>{remainingTime}</Typography>
-        </Box>
-      )
-      }
+      {renderRemainingTime}
     </CountdownCircleTimer >
   )
 };
@@ -58,7 +62,7 @@ export const QuestionCard = (
   const [helperText, setHelperText] = useState('Choose wisely');
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
-  const classes = useStyles();
+  const classes = useStyles({ mobile });
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const answer = (event.target as HTMLInputElement).value
@@ -83,13 +87,13 @@ export const QuestionCard = (
       answerCurrect();
       setError(false);
     } else {
-      setHelperText('Sorry, wrong answer!');
+      setHelperText('Wrong answer!');
       setError(true);
     }
   };
 
   return (
-    <Paper className={classes.paper} elevation={6} sx={{}}>
+    <Paper className={classes.paper} elevation={6}>
       <Stack direction={mobile ? 'column-reverse' : 'row'} spacing={2} >
         <Box className={classes.question}>
           {
@@ -99,7 +103,10 @@ export const QuestionCard = (
               </Box>
               :
               <>
-                <Typography variant='h5' fontWeight={'bold'} paragraph className={classes.questionText}>{question.question}</Typography>
+                <Chip className={classes.chipTag} label={question.category} component={Typography} sx={{ mb: 2 }} />
+                <Typography variant='h5' className={classes.questionText}>
+                  {question.question}
+                </Typography>
                 <form >
                   <FormControl error={error} variant="standard" fullWidth>
                     <RadioGroup
@@ -116,7 +123,7 @@ export const QuestionCard = (
                             }}
                             value={answer}
                             control={<Radio />}
-                            label={<Typography fontWeight={'700'}>{answer}</Typography>} />
+                            label={<Typography fontWeight={'bold'}>{answer}</Typography>} />
                         )
                       }
                     </RadioGroup>
@@ -142,7 +149,7 @@ const useStyles = makeStyles({
     padding: '24px',
     '&.MuiPaper-root': {
       borderRadius: '30px',
-      background: 'linear-gradient(to bottom, #ffd58e, #fff5ee)'
+      background: 'linear-gradient(to bottom, #fff, #b1d8f5 );',
     },
   },
   question: {
@@ -155,6 +162,12 @@ const useStyles = makeStyles({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight:'20vh'
+  },
+  chipTag: {
+    width: 'fit-content',
+    marginBottom: '100px',
+    border: '1px solid red'
   },
   questionText: {
     textShadow: '1px 1px 2px pink'
