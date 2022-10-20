@@ -52,8 +52,8 @@ const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, 
 };
 
 export const QuestionCard = (
-  { question, queryOptions, answeredCurrect }
-    : { question: IQuestion, queryOptions: IQueryOptions, answeredCurrect: () => void; }) => {
+  { question, queryOptions, answeredCorrect }
+    : { question: IQuestion, queryOptions: IQueryOptions, answeredCorrect: () => void; }) => {
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
   const [helperText, setHelperText] = useState('Choose wisely');
@@ -76,8 +76,8 @@ export const QuestionCard = (
       return;
     }
     if (answer === question.correct_answer) {
-      setHelperText('Currect answer!');
-      answeredCurrect();
+      setHelperText('Correct answer!');
+      answeredCorrect();
       setError(false);
     } else {
       setHelperText('Wrong answer!');

@@ -17,7 +17,7 @@ import { QuestionCard } from '../../components';
 
 const REFETCH_DELAY = 3000
 
-const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answered: number }) => {
+const Summary = ({ correctAnswered, answered }: { correctAnswered: number, answered: number }) => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const classes = useStyles({ mobile });
@@ -28,9 +28,9 @@ const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answe
         <ListItem sx={listItemSx}>
           <Typography variant='h6' className={classes.listItemText}>
             <Check color='success' />&ensp;
-            Currect:
+            Correct:
           </Typography>
-          <Typography variant='h6' color={theme.palette.success.main}>{currectAnswered}</Typography>
+          <Typography variant='h6' color={theme.palette.success.main}>{correctAnswered}</Typography>
         </ListItem>
         <ListItem sx={listItemSx}>
           <Typography variant='h6' className={classes.listItemText}>
@@ -44,7 +44,7 @@ const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answe
             <Functions color='warning' />&ensp;
             Accuracy:
           </Typography>
-          <Typography variant='h6' color={theme.palette.warning.main}>{$percentage(currectAnswered / answered)}</Typography>
+          <Typography variant='h6' color={theme.palette.warning.main}>{$percentage(correctAnswered / answered)}</Typography>
         </ListItem>
       </List>
     </Box >
@@ -52,7 +52,7 @@ const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answe
 }
 
 export const PageHome = () => {
-  const [currectAnswered, setCurrectAnswered] = useState(0);
+  const [correctAnswered, setCorrectAnswered] = useState(0);
   const [answered, setAnswered] = useState(0);
 
   useQueryClient();
@@ -63,13 +63,13 @@ export const PageHome = () => {
     setTimeout(() => refetch(), REFETCH_DELAY)
   };
 
-  const answeredCurrect = () => setCurrectAnswered(prev => prev + 1);
+  const answeredCorrect = () => setCorrectAnswered(prev => prev + 1);
 
   const queryOptions = { refetchHandler, isFetched, isFetching, isLoading, error, isRefetching };
 
   return (
     <Container>
-      <Summary currectAnswered={currectAnswered} answered={answered} />
+      <Summary correctAnswered={correctAnswered} answered={answered} />
       {
         isLoading ?
           <Stack spacing={2}>
@@ -78,7 +78,7 @@ export const PageHome = () => {
           </Stack>
           :
           !!data && data.map((question) =>
-            <QuestionCard key={question.question} question={question} queryOptions={queryOptions} answeredCurrect={answeredCurrect} />
+            <QuestionCard key={question.question} question={question} queryOptions={queryOptions} answeredCorrect={answeredCorrect} />
           )
       }
     </Container>
