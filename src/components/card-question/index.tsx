@@ -19,10 +19,7 @@ import { IQuestion } from '../../../services/model';
 interface IQueryOptions {
   refetchHandler?: () => void,
   isFetched?: boolean,
-  isFetching?: boolean,
-  isLoading?: boolean,
   isRefetching?: boolean,
-  error?: any
 }
 
 const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, value: string, submit: (timeout: boolean) => void }) => {

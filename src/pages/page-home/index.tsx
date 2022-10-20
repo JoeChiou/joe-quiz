@@ -8,7 +8,7 @@ import {
   Skeleton,
   SxProps,
   Typography,
-  useMediaQuery, useTheme
+  useMediaQuery, useTheme,
 } from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 import { Check, QuestionAnswer, Functions } from '@mui/icons-material';
@@ -57,16 +57,16 @@ export const PageHome = () => {
   const classes = useStyles();
 
   useQueryClient();
-  const { data, refetch, isFetched, isFetching, isLoading, error, isRefetching } = useQuery(['todos'], getQuestions)
+  const { data, refetch, isFetched, isLoading, isRefetching } = useQuery(['todos'], getQuestions)
 
-  const refetchHandler = () => {
+  const answeredHandler = () => {
     setAnswered(prev => prev + 1);
     setTimeout(() => refetch(), REFETCH_DELAY)
   };
 
   const answeredCorrect = () => setCorrectAnswered(prev => prev + 1);
 
-  const queryOptions = { refetchHandler, isFetched, isFetching, isLoading, error, isRefetching };
+  const queryOptions = { answeredHandler, isFetched, isRefetching };
 
   return (
     <Box className={classes.wrap}>
