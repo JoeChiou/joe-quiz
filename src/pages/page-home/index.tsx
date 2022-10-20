@@ -54,9 +54,6 @@ const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answe
 export const PageHome = () => {
   const [currectAnswered, setCurrectAnswered] = useState(0);
   const [answered, setAnswered] = useState(0);
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down('md'));
-  const classes = useStyles({ mobile });
 
   useQueryClient();
   const { data, refetch, isFetched, isFetching, isLoading, error, isRefetching } = useQuery(['todos'], getQuestions)
