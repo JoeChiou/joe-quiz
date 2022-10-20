@@ -54,6 +54,7 @@ const Summary = ({ correctAnswered, answered }: { correctAnswered: number, answe
 export const PageHome = () => {
   const [correctAnswered, setCorrectAnswered] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const classes = useStyles();
 
   useQueryClient();
   const { data, refetch, isFetched, isFetching, isLoading, error, isRefetching } = useQuery(['todos'], getQuestions)
@@ -68,24 +69,31 @@ export const PageHome = () => {
   const queryOptions = { refetchHandler, isFetched, isFetching, isLoading, error, isRefetching };
 
   return (
-    <Container>
-      <Summary correctAnswered={correctAnswered} answered={answered} />
-      {
-        isLoading ?
-          <Stack spacing={2}>
-            <Skeleton variant="rounded" height={60} animation="wave" />
-            <Skeleton variant="rounded" height={150} animation="wave" />
-          </Stack>
-          :
-          !!data && data.map((question) =>
-            <QuestionCard key={question.question} question={question} queryOptions={queryOptions} answeredCorrect={answeredCorrect} />
-          )
-      }
-    </Container>
+    <Box className={classes.wrap}>
+      <Container>
+        <Summary correctAnswered={correctAnswered} answered={answered} />
+        {
+          isLoading ?
+            <Stack spacing={2}>
+              <Skeleton variant="rounded" height={60} animation="wave" />
+              <Skeleton variant="rounded" height={150} animation="wave" />
+            </Stack>
+            :
+            !!data && data.map((question) =>
+              <QuestionCard key={question.question} question={question} queryOptions={queryOptions} answeredCorrect={answeredCorrect} />
+            )
+        }
+      </Container>
+    </Box>
   )
 };
 
 const useStyles = makeStyles({
+  wrap: {
+    height: '100vh',
+    width: '100vw',
+    background: '#eeeeee'
+  },
   summary: {
     display: 'flex',
     alignItems: 'end',
