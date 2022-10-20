@@ -1,19 +1,19 @@
 import * as React from 'react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box, Paper,
   Stack,
   Typography,
-  FormControl, FormControlLabel,
-  FormHelperText,
+  FormControl, FormControlLabel, FormHelperText,
   RadioGroup, Radio,
   CircularProgress,
+  Chip,
   useMediaQuery,
   useTheme,
-  Chip,
 } from '@mui/material';
-import { CountdownCircleTimer } from 'react-countdown-circle-timer';
+import { Check, Close } from '@mui/icons-material';
 import { makeStyles } from '@material-ui/styles';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { IQuestion } from '../../../services/model';
 
 interface IQueryOptions {
@@ -31,23 +31,20 @@ const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, 
 
   const renderRemainingTime = ({ remainingTime, color }: { remainingTime: number, color: string }) => (
     <Box className={classes.remainingtimeBox} sx={{ color: color }}>
-      <Typography variant='h4'>{remainingTime}</Typography>
+      <Typography variant='h4'>{remainingTime == 0 ? 'Timeout!' : remainingTime}</Typography>
     </Box>
   )
-  
+
   return (
     <CountdownCircleTimer
       isPlaying={isPlaying}
       duration={15}
       colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
       colorsTime={[10, 6, 3, 0]}
-      initialRemainingTime={15}
       onComplete={() => {
         submit(true);
-        setTimeout(() => {
-          queryOptions.refetchHandler();
-        }, 1500);
-        return ({ shouldRepeat: true, delay: 1.5 })
+        queryOptions.refetchHandler();
+        return ({ shouldRepeat: true, delay: 0, newInitialRemainingTime: 15 })
       }}>
       {renderRemainingTime}
     </CountdownCircleTimer >
@@ -55,8 +52,8 @@ const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, 
 };
 
 export const QuestionCard = (
-  { question, queryOptions, answerCurrect }
-    : { question: IQuestion, queryOptions: IQueryOptions, answerCurrect: () => void; }) => {
+  { question, queryOptions, answeredCurrect }
+    : { question: IQuestion, queryOptions: IQueryOptions, answeredCurrect: () => void; }) => {
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
   const [helperText, setHelperText] = useState('Choose wisely');
@@ -68,23 +65,19 @@ export const QuestionCard = (
     const answer = (event.target as HTMLInputElement).value
     setValue(answer);
     handleSubmit(false, answer);
-    setTimeout(() => {
-      queryOptions.refetchHandler();
-      setHelperText(' ');
-      setError(false);
-    }, 1500);
+    queryOptions.refetchHandler();
   };
 
   const handleSubmit = (timeout: boolean = false, answer?: string) => {
     if (timeout) {
-      setHelperText('Timeout!')
+      setHelperText('Timeout!');
       setValue('timeout');
       setError(true);
       return;
     }
     if (answer === question.correct_answer) {
-      setHelperText('Currect!');
-      answerCurrect();
+      setHelperText('Currect answer!');
+      answeredCurrect();
       setError(false);
     } else {
       setHelperText('Wrong answer!');
@@ -92,51 +85,60 @@ export const QuestionCard = (
     }
   };
 
+  useEffect(() => {
+    if (queryOptions.isRefetching) {
+      setHelperText(' ');
+      setError(false)
+    }
+  }, [queryOptions.isRefetching])
+
   return (
     <Paper className={classes.paper} elevation={6}>
-      <Stack direction={mobile ? 'column-reverse' : 'row'} spacing={2} >
-        <Box className={classes.question}>
-          {
-            queryOptions.isRefetching ?
-              <Box className={classes.progressBox}>
-                <CircularProgress />
-              </Box>
-              :
-              <>
-                <Chip className={classes.chipTag} label={question.category} component={Typography} sx={{ mb: 2 }} />
-                <Typography variant='h5' className={classes.questionText}>
-                  {question.question}
-                </Typography>
-                <form >
-                  <FormControl error={error} variant="standard" fullWidth>
-                    <RadioGroup
-                      name="quiz"
-                      value={value}
-                      onChange={handleRadioChange}>
-                      {
-                        question.answers.map((answer) =>
-                          <FormControlLabel
-                            key={answer}
-                            disabled={!!value}
-                            sx={{
+      {
+        queryOptions.isRefetching ?
+          <Box className={classes.progressBox}>
+            <CircularProgress />
+          </Box>
+          :
+          <Stack direction={mobile ? 'column-reverse' : 'row'} spacing={2} >
+            <Box className={classes.question}>
+              <Chip className={classes.chipTag} label={question.category} component={Typography} sx={{ mb: 2 }} />
+              <Typography variant='h5' className={classes.questionText}>
+                {question.question}
+              </Typography>
+              <form >
+                <FormControl error={error} variant="standard" fullWidth>
+                  <RadioGroup
+                    name="quiz"
+                    value={value}
+                    onChange={handleRadioChange}>
+                    {
+                      question.answers.map((answer) =>
+                        <FormControlLabel
+                          key={answer}
+                          disabled={!!value}
+                          value={answer}
+                          control={<Radio />}
+                          label={
+                            <Stack direction='row' spacing={1} sx={{
                               color: value ? answer === question.correct_answer ? '#0cbd1b' : 'red' : 'inherit',
-                            }}
-                            value={answer}
-                            control={<Radio />}
-                            label={<Typography fontWeight={'bold'}>{answer}</Typography>} />
-                        )
-                      }
-                    </RadioGroup>
-                    <FormHelperText>{helperText}</FormHelperText>
-                  </FormControl>
-                </form>
-              </>
-          }
-        </Box>
-        <Box className={classes.timerBox}>
-          <Timer queryOptions={queryOptions} submit={handleSubmit} value={value} />
-        </Box>
-      </Stack>
+                            }}>
+                              <Typography fontWeight={'bold'}>{answer}</Typography>
+                              {value ? answer === question.correct_answer ? <Check /> : <Close /> : ''}
+                            </Stack>
+                          } />
+                      )
+                    }
+                  </RadioGroup>
+                  <FormHelperText>{helperText}</FormHelperText>
+                </FormControl>
+              </form>
+            </Box>
+            <Box className={classes.timerBox}>
+              <Timer queryOptions={queryOptions} submit={handleSubmit} value={value} />
+            </Box>
+          </Stack>
+      }
     </Paper >
   )
 };
@@ -162,7 +164,7 @@ const useStyles = makeStyles({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight:'20vh'
+    minHeight: '20vh'
   },
   chipTag: {
     width: 'fit-content',

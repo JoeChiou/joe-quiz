@@ -1,18 +1,27 @@
 import * as React from 'react';
 import { useState } from "react";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Box, Container, List, ListItem, Skeleton, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box, Container,
+  List, ListItem,
+  Stack,
+  Skeleton,
+  SxProps,
+  Typography,
+  useMediaQuery, useTheme
+} from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 import { Check, QuestionAnswer, Functions } from '@mui/icons-material';
 import { $percentage, getQuestions } from '../../../services';
 import { QuestionCard } from '../../components';
 
+const REFETCH_DELAY = 3000
 
 const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answered: number }) => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const classes = useStyles({ mobile });
-  const listItemSx = { py: mobile ? 0 : 1 }
+  const listItemSx: SxProps = { py: mobile ? 0 : 1 }
   return (
     <Box className={classes.summary} >
       <List sx={{ width: mobile ? '100%' : '25%' }}>
@@ -43,28 +52,26 @@ const Summary = ({ currectAnswered, answered }: { currectAnswered: number, answe
 }
 
 export const PageHome = () => {
-  useQueryClient();
   const [currectAnswered, setCurrectAnswered] = useState(0);
   const [answered, setAnswered] = useState(0);
-  const { data, refetch, isFetched, isFetching, isLoading, error, isRefetching } = useQuery(['todos'], getQuestions)
-
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('md'));
   const classes = useStyles({ mobile });
 
+  useQueryClient();
+  const { data, refetch, isFetched, isFetching, isLoading, error, isRefetching } = useQuery(['todos'], getQuestions)
+
   const refetchHandler = () => {
     setAnswered(prev => prev + 1);
-    refetch();
+    setTimeout(() => refetch(), REFETCH_DELAY)
   };
 
-  const answerCurrect = () => {
-    setCurrectAnswered(prev => prev + 1);
-  }
+  const answeredCurrect = () => setCurrectAnswered(prev => prev + 1);
 
   const queryOptions = { refetchHandler, isFetched, isFetching, isLoading, error, isRefetching };
 
   return (
-    <Container className={classes.container}>
+    <Container>
       <Summary currectAnswered={currectAnswered} answered={answered} />
       {
         isLoading ?
@@ -74,7 +81,7 @@ export const PageHome = () => {
           </Stack>
           :
           !!data && data.map((question) =>
-            <QuestionCard key={question.question} question={question} queryOptions={queryOptions} answerCurrect={answerCurrect} />
+            <QuestionCard key={question.question} question={question} queryOptions={queryOptions} answeredCurrect={answeredCurrect} />
           )
       }
     </Container>
@@ -82,8 +89,6 @@ export const PageHome = () => {
 };
 
 const useStyles = makeStyles({
-  container: {
-  },
   summary: {
     display: 'flex',
     alignItems: 'end',
