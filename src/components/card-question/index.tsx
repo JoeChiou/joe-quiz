@@ -31,7 +31,7 @@ const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, 
 
   const renderRemainingTime = ({ remainingTime, color }: { remainingTime: number, color: string }) => (
     <Box className={classes.remainingtimeBox} sx={{ color: color }}>
-      <Typography variant='h4'>{remainingTime == 0 ? 'Timeout!' : remainingTime}</Typography>
+      <Typography variant='h4'>{remainingTime == 0 ? "Time's up!" : remainingTime}</Typography>
     </Box>
   )
 
@@ -70,8 +70,8 @@ export const QuestionCard = (
 
   const handleSubmit = (timeout: boolean = false, answer?: string) => {
     if (timeout) {
-      setHelperText('Timeout!');
-      setValue('timeout');
+      setHelperText("Time's up!");
+      setValue("Time's up!");
       setError(true);
       return;
     }
