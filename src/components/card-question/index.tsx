@@ -17,7 +17,7 @@ import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { IQuestion } from '../../../services/model';
 
 interface IQueryOptions {
-  refetchHandler?: () => void,
+  answeredHandler?: () => void,
   isFetched?: boolean,
   isRefetching?: boolean,
 }
@@ -40,7 +40,7 @@ const Timer = ({ queryOptions, value, submit, }: { queryOptions: IQueryOptions, 
       colorsTime={[10, 6, 3, 0]}
       onComplete={() => {
         submit(true);
-        queryOptions.refetchHandler();
+        queryOptions.answeredHandler();
         return ({ shouldRepeat: true, delay: 0, newInitialRemainingTime: 15 })
       }}>
       {renderRemainingTime}
@@ -62,7 +62,7 @@ export const QuestionCard = (
     const answer = (event.target as HTMLInputElement).value
     setValue(answer);
     handleSubmit(false, answer);
-    queryOptions.refetchHandler();
+    queryOptions.answeredHandler();
   };
 
   const handleSubmit = (timeout: boolean = false, answer?: string) => {
